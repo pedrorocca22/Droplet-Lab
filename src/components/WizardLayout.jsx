@@ -11,8 +11,8 @@ import StepExecute from './StepExecute';
 const STEPS = [
   { num: 1, title: 'Login', icon: User },
   { num: 2, title: 'Sustrato', icon: Beaker },
-  { num: 3, title: 'Configuración', icon: Settings },
-  { num: 4, title: 'Secuencia', icon: List },
+  { num: 3, title: 'Secuencia', icon: List },
+  { num: 4, title: 'Configuración', icon: Settings },
   { num: 5, title: 'Ejecución', icon: Play },
 ];
 
@@ -29,8 +29,8 @@ const WizardLayout = () => {
     switch (currentStep) {
       case 1: return <StepLogin />;
       case 2: return <StepBaseElement />;
-      case 3: return <StepConfig />;
-      case 4: return <StepSequence />;
+      case 3: return <StepSequence />;
+      case 4: return <StepConfig />;
       case 5: return <StepExecute />;
       default: return <StepLogin />;
     }

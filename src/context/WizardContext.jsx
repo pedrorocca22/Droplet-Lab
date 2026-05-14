@@ -15,12 +15,12 @@ export const WizardProvider = ({ children }) => {
   const [selectedSubstrateId, setSelectedSubstrateId] = useState(SUBSTRATE_TYPES.PLATE_96.id);
   const [virtualGridParams, setVirtualGridParams] = useState({ n: 6, pitch: 10 });
 
-  // State for Configuration (Step 3)
-  const [config, setConfig] = useState(DEFAULT_CONFIG);
-
-  // State for Sequence (Step 4)
+  // State for Sequence (Step 3)
   const [sequenceSteps, setSequenceSteps] = useState([]);
   const [lockedWells, setLockedWells] = useState(new Set());
+
+  // State for Configuration (Step 4)
+  const [config, setConfig] = useState(DEFAULT_CONFIG);
 
   // Serial Connection State
   const [serialState, setSerialState] = useState({
