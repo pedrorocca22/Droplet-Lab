@@ -8,6 +8,57 @@ import { ArrowLeft, ArrowRight, Plus, Trash2, Download, Upload, Droplets, Chevro
 const rowChar = r => String.fromCharCode(65 + r);
 const wellId = (r, c) => `${rowChar(r)}${c + 1}`;
 
+// ── Valid well IDs helper ────────────────────────────────────────
+const computeValidWellIds = (substrate, virtualParams) => {
+  const valid = new Set();
+  if (substrate.type === 'petri') {
+    const { n, pitch } = virtualParams;
+    const physR = substrate.diameter / 2;
+    const safeR = physR - 5;
+    for (let ri = 0; ri < n; ri++) {
+      for (let ci = 0; ci < n; ci++) {
+        const physX = -(n - 1) * pitch / 2 + ci * pitch;
+        const physY = -(n - 1) * pitch / 2 + ri * pitch;
+        if (Math.sqrt(physX * physX + physY * physY) <= safeR) {
+          valid.add(wellId(ri, ci));
+        }
+      }
+    }
+  } else if (substrate.type === 'slide') {
+    const { width, height } = substrate;
+    const scale = Math.min((PLATE_W - 16) / width, (PLATE_H - 16) / height);
+    const sx = (PLATE_W - width * scale) / 2;
+    const sy = (PLATE_H - height * scale) / 2;
+    const { n, pitch } = virtualParams;
+    const safeOffsetPhys = 2;
+    const safeSX = sx + safeOffsetPhys * scale;
+    const safeSY = sy + safeOffsetPhys * scale;
+    const safeW = (width - safeOffsetPhys * 2) * scale;
+    const safeH = (height - safeOffsetPhys * 2) * scale;
+    const gridW = (n - 1) * pitch * scale;
+    const gridH = (n - 1) * pitch * scale;
+    const gridSX = sx + (width * scale - gridW) / 2;
+    const gridSY = sy + (height * scale - gridH) / 2;
+    for (let ri = 0; ri < n; ri++) {
+      for (let ci = 0; ci < n; ci++) {
+        const wx = gridSX + ci * pitch * scale;
+        const wy = gridSY + ri * pitch * scale;
+        if (wx >= safeSX && wx <= safeSX + safeW && wy >= safeSY && wy <= safeSY + safeH) {
+          valid.add(wellId(ri, ci));
+        }
+      }
+    }
+  } else if (substrate.type === 'multiwell') {
+    const { rows, cols } = substrate;
+    for (let ri = 0; ri < rows; ri++) {
+      for (let ci = 0; ci < cols; ci++) {
+        valid.add(wellId(ri, ci));
+      }
+    }
+  }
+  return valid;
+};
+
 // ── Plate SVG Renderer ───────────────────────────────────────────
 // Uses physical mm as SVG units (viewBox = plate dimensions)
 const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWellClick, wellMeta, virtualParams }) => {
@@ -314,6 +365,36 @@ const StepSequence = () => {
       setVirtualGridParams(VIRTUAL_GRID_DEFAULTS[selectedSubstrateId]);
     }
   }, [selectedSubstrateId]);
+
+  // Clean up wells that fall outside the working area when virtual grid params change
+  useEffect(() => {
+    if (!substrate.isVirtualGrid) return;
+    const validIds = computeValidWellIds(substrate, virtualGridParams);
+
+    setSelectedWells(prev => {
+      const next = new Set([...prev].filter(id => validIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+
+    setSequenceSteps(prev => {
+      let changed = false;
+      const newSteps = prev.map(step => {
+        const filtered = new Set([...step.wells].filter(id => validIds.has(id)));
+        if (filtered.size !== step.wells.size) changed = true;
+        return { ...step, wells: filtered };
+      }).filter(step => {
+        if (step.wells.size === 0) { changed = true; return false; }
+        return true;
+      });
+      return changed ? newSteps : prev;
+    });
+
+    setLockedWells(prev => {
+      const next = new Set([...prev].filter(id => validIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [virtualGridParams, selectedSubstrateId]);
 
   const handleWellClick = useCallback((id) => {
     setSelectedWells(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
