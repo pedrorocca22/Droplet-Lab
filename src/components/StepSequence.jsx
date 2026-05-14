@@ -84,7 +84,7 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
     }
 
     return (
-      <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block', borderRadius: 8 }}>
+      <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
         <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f8fafc" stroke="#e2e8f0" strokeWidth={0.5} />
         <path d={`M${PLATE_W - 8},0 L${PLATE_W},0 L${PLATE_W},8 Z`} fill="#e2e8f0" />
         {wells}
@@ -433,7 +433,7 @@ const StepSequence = () => {
           </div>
 
           {/* SVG — drag-selectable */}
-          <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, overflow: 'hidden', cursor: 'crosshair' }}>
+          <div style={{ overflow: 'hidden', cursor: 'crosshair' }}>
             <svg ref={svgRef} viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%"
               style={{ display: 'block', userSelect: 'none' }}
               onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}>
