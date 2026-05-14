@@ -531,7 +531,7 @@ const StepSequence = () => {
         );
       })()}
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'stretch' }}>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
 
         {/* ── Left: SVG plate ─────────────────────────────── */}
         <div ref={plateRef} className="glass-panel" style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
@@ -550,7 +550,7 @@ const StepSequence = () => {
           </div>
 
           {/* SVG — drag-selectable */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'crosshair', backgroundColor: '#fdfdfd', borderRadius: 6, border: '1px solid var(--border-color)' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'crosshair', backgroundColor: '#fdfdfd', borderRadius: 6, border: '1px solid var(--border-color)', minHeight: 0 }}>
             <svg ref={svgRef} viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%"
               style={{ display: 'block', userSelect: 'none', maxHeight: '100%' }}
               onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}>
@@ -573,7 +573,7 @@ const StepSequence = () => {
         </div>
 
         {/* ── Right: Sequence panel ────────────────────────── */}
-        <div style={{ flex: '0 0 360px', display: 'flex', flexDirection: 'column', gap: '0.75rem', height: panelHeight ? `${panelHeight}px` : 'auto', maxHeight: panelHeight ? `${panelHeight}px` : 'none' }}>
+        <div style={{ flex: '0 0 360px', display: 'flex', flexDirection: 'column', gap: '0.75rem', height: panelHeight || 'auto', maxHeight: panelHeight || 'none' }}>
 
           {/* Add step */}
           <div className="glass-panel">
