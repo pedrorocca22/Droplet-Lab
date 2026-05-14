@@ -161,17 +161,11 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
     return (
       <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
         <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f8fafc" stroke="#e2e8f0" strokeWidth={0.5} />
-        {/* Outer dish wall */}
-        <circle cx={cx} cy={cy} r={displayR + 3.5} fill="#dde3ea" stroke="none" />
-        {/* Dish inner surface */}
-        <circle cx={cx} cy={cy} r={displayR} fill="#f4f6f9" stroke="#c8d0db" strokeWidth={0.4} />
+        {/* Main Petri perimeter */}
+        <circle cx={cx} cy={cy} r={displayR} fill="#f4f6f9" stroke="#94a3b8" strokeWidth={1} />
         {/* Safety offset boundary (dashed) */}
         <circle cx={cx} cy={cy} r={safeDisplayR} fill="none"
-          stroke="#cbd5e1" strokeWidth={0.4} strokeDasharray="1.5 1.5" />
-        {/* Scale bar: 10mm */}
-        <line x1={cx - 5 * scale} y1={cy + displayR + 2.5} x2={cx + 5 * scale} y2={cy + displayR + 2.5}
-          stroke="#94a3b8" strokeWidth={0.4} />
-        <text x={cx} y={cy + displayR + 4.5} fontSize={2.2} fill="#94a3b8" textAnchor="middle">10 mm</text>
+          stroke="#cbd5e1" strokeWidth={0.3} strokeDasharray="1 1" />
         {points}{labels}{volTexts}
       </svg>
     );
@@ -244,8 +238,6 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
         <rect x={sx + width * scale * 0.7} y={sy} width={width * scale * 0.3} height={height * scale}
           rx={1} fill="rgba(219,234,254,0.5)" stroke="#bfdbfe" strokeWidth={0.4} />
         <text x={sx + width * scale * 0.85} y={sy + height * scale + 3} fontSize={2} fill="#93c5fd" textAnchor="middle">cover slip</text>
-        <line x1={sx} y1={sy + height * scale + 2} x2={sx + 10 * scale} y2={sy + height * scale + 2} stroke="#94a3b8" strokeWidth={0.4} />
-        <text x={sx + 5 * scale} y={sy + height * scale + 4} fontSize={2} fill="#94a3b8" textAnchor="middle">10 mm</text>
         {points}{labels}{volTexts}
       </svg>
     );
