@@ -7,6 +7,8 @@ Droplet Lab is a professional web application designed to orchestrate the deposi
 > [!WARNING]
 > **Beta Version in Development**: This software is currently in an active development phase. Always verify G-code paths in a simulator before running on physical hardware to prevent nozzle or substrate damage.
 
+<img width="1910" height="912" alt="Droplet-lab2" src="https://github.com/user-attachments/assets/077ce156-4505-4d3a-9f7a-27bf4d9591ca" />
+
 ---
 
 ## Main Features
@@ -27,6 +29,8 @@ Droplet Lab is a professional web application designed to orchestrate the deposi
     - **Interactive Calibration**: Automated homing and positioning for Z-zero calibration.
     - **Manual Jogging**: Fine-grained Z-axis adjustment and manual extruder control for syringe priming.
     - **Web Serial API**: Direct browser-to-machine communication without external drivers.
+
+<img width="1911" height="913" alt="Droplet-lab1" src="https://github.com/user-attachments/assets/d6d607c4-a8e3-4018-880c-71f4019b3b04" />
 
 ---
 
