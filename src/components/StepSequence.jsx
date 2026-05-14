@@ -185,6 +185,12 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
 
     const points = [], labels = [], volTexts = [];
 
+    const safeOffsetPhys = 2; // 2mm safety offset
+    const safeSX = sx + safeOffsetPhys * scale;
+    const safeSY = sy + safeOffsetPhys * scale;
+    const safeW  = (width - safeOffsetPhys * 2) * scale;
+    const safeH  = (height - safeOffsetPhys * 2) * scale;
+
     // Grid centered in the slide
     const gridW = (n - 1) * pitch * scale;
     const gridH = (n - 1) * pitch * scale;
@@ -196,8 +202,9 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
         const id = wellId(ri, ci);
         const wx = gridSX + ci * pitch * scale;
         const wy = gridSY + ri * pitch * scale;
-        // Clip to slide boundaries with 1mm margin
-        if (wx < sx + 1 || wx > sx + width * scale - 1 || wy < sy + 1 || wy > sy + height * scale - 1) continue;
+
+        // Clip to slide boundaries with 2mm margin
+        if (wx < safeSX || wx > safeSX + safeW || wy < safeSY || wy > safeSY + safeH) continue;
 
         const stepIdx   = wellStepMap[id];
         const stepColor = stepIdx !== undefined ? STEP_COLORS[stepIdx % STEP_COLORS.length] : null;
@@ -234,7 +241,12 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
     return (
       <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
         <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f8fafc" stroke="#e2e8f0" strokeWidth={0.5} />
-        <rect x={sx} y={sy} width={width * scale} height={height * scale} rx={1} fill="#eef2f7" stroke="#c8d0db" strokeWidth={0.5} />
+        {/* Main Slide Body */}
+        <rect x={sx} y={sy} width={width * scale} height={height * scale} rx={1} fill="#eef2f7" stroke="#94a3b8" strokeWidth={1} />
+        {/* Safety offset boundary (dashed) */}
+        <rect x={safeSX} y={safeSY} width={safeW} height={safeH} rx={0.5} fill="none"
+          stroke="#cbd5e1" strokeWidth={0.3} strokeDasharray="1 1" />
+        {/* Cover slip area indication */}
         <rect x={sx + width * scale * 0.7} y={sy} width={width * scale * 0.3} height={height * scale}
           rx={1} fill="rgba(219,234,254,0.5)" stroke="#bfdbfe" strokeWidth={0.4} />
         <text x={sx + width * scale * 0.85} y={sy + height * scale + 3} fontSize={2} fill="#93c5fd" textAnchor="middle">cover slip</text>
