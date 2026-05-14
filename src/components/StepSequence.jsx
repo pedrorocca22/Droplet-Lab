@@ -353,6 +353,7 @@ const StepSequence = () => {
   const substrate = SUBSTRATE_TYPES[selectedSubstrateId];
   const [selectedWells, setSelectedWells] = useState(new Set());
   const [volume, setVolume] = useState('10');
+  const [randomPercent, setRandomPercent] = useState(50);
   const svgRef = useRef(null);
   const wellMeta = useRef({});
   const fileRef = useRef(null);
@@ -442,13 +443,17 @@ const StepSequence = () => {
     setSelectedWells(all);
   };
 
-  const selectPattern = (pattern) => {
+  const selectRandom = (percentage) => {
     const ids = Object.keys(wellMeta.current).filter(w => !lockedWells.has(w));
-    let sel = [];
-    if (pattern === 'odd') sel = ids.filter((_, i) => i % 2 === 0);
-    else if (pattern === 'even') sel = ids.filter((_, i) => i % 2 === 1);
-    else if (pattern === 'row_a') sel = ids.filter(w => w.startsWith('A'));
-    setSelectedWells(new Set(sel));
+    if (ids.length === 0) return;
+    const clamped = Math.min(100, Math.max(0, percentage));
+    const count = Math.round(ids.length * clamped / 100);
+    const shuffled = [...ids];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setSelectedWells(new Set(shuffled.slice(0, count)));
   };
 
   const saveJSON = () => {
@@ -521,8 +526,13 @@ const StepSequence = () => {
             <span style={{ fontWeight: 600, fontSize: '0.95rem', marginRight: 'auto' }}>{substrate.name}</span>
             <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={selectAll}>Sel. todo</button>
             <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={() => setSelectedWells(new Set())}>Limpiar sel.</button>
-            <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={() => selectPattern('odd')}>Alternos</button>
-            <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={() => selectPattern('row_a')}>Fila A</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <input type="number" min={0} max={100} step={1} value={randomPercent}
+                onChange={e => setRandomPercent(parseInt(e.target.value) || 0)}
+                style={{ width: '44px', padding: '0.2rem 0.3rem', fontSize: '0.78rem', textAlign: 'center' }} />
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>%</span>
+              <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={() => selectRandom(randomPercent)}>Aleatorio</button>
+            </div>
           </div>
 
           {/* SVG — drag-selectable */}
