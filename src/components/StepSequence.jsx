@@ -573,10 +573,18 @@ const StepSequence = () => {
         </div>
 
         {/* ── Right: Sequence panel ────────────────────────── */}
-        <div style={{ flex: '0 0 360px', display: 'flex', flexDirection: 'column', gap: '0.75rem', height: panelHeight || 'auto', maxHeight: panelHeight || 'none' }}>
+        <div style={{ 
+          flex: '0 0 360px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '0.75rem', 
+          height: panelHeight ? `${panelHeight}px` : '600px', 
+          maxHeight: panelHeight ? `${panelHeight}px` : '600px',
+          overflow: 'hidden' 
+        }}>
 
           {/* Add step */}
-          <div className="glass-panel">
+          <div className="glass-panel" style={{ flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               <Droplets size={16} color="var(--accent-primary)" />
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Añadir Paso</span>
@@ -595,7 +603,7 @@ const StepSequence = () => {
           </div>
 
           {/* Sequence list */}
-          <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem', gap: '0.5rem' }}>
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Secuencia</span>
               <span className="badge" style={{ whiteSpace: 'nowrap' }}>{sequenceSteps.length}p · {totalDeposits}dep.</span>
