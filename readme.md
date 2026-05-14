@@ -5,42 +5,42 @@
 Droplet Lab is a professional web application designed to orchestrate the deposition of hydrogels, biomaterials, and chemical compounds onto standard laboratory substrates. From multiwell plates to petri dishes, Droplet Lab provides a seamless, wizard-driven workflow to configure sequences and generate G-code for automated dispensing systems.
 
 > [!WARNING]
-> **Versión Beta en Desarrollo**: Este software se encuentra en fase activa de desarrollo. Verifique siempre las rutas de G-code en un simulador antes de ejecutar en hardware físico para evitar daños en la boquilla o el sustrato.
+> **Beta Version in Development**: This software is currently in an active development phase. Always verify G-code paths in a simulator before running on physical hardware to prevent nozzle or substrate damage.
 
 ---
 
-## Características Principales
+## Main Features
 
-- **Flujo de Trabajo Guiado**: Un proceso estructurado de 5 pasos diseñado para entornos de laboratorio:
-  1. **Login e Identificación**: Trazabilidad de usuario y conexión centralizada de hardware.
-  2. **Selección de Sustrato**: Soporte para placas multiwell SBS estándar y plataformas totalmente personalizadas.
-  3. **Diseñador de Secuencias**: Selección visual interactiva de puntos de deposición con seguimiento de volumen.
-  4. **Configuración de Máquina**: Ajuste de parámetros físicos, velocidades y calibración interactiva del eje Z.
-  5. **Ejecución y Monitoreo**: Terminal de G-code en tiempo real y monitoreo de consola simétrico.
+- **Guided Wizard Workflow**: A structured 5-step process designed for laboratory environments:
+  1. **Login & Identification**: User traceability and centralized hardware connection.
+  2. **Substrate Selection**: Support for standard SBS multiwell plates and fully custom platforms.
+  3. **Sequence Designer**: Interactive visual selection of deposition points with volume tracking.
+  4. **Machine Configuration**: Physical parameter adjustments and interactive Z-axis calibration.
+  5. **Execution & Monitoring**: Real-time G-code terminal and symmetric console monitoring.
 
-- **Visualización de Precisión**:
-    - **Cumplimiento SBS**: Dimensiones físicas exactas para todas las placas estándar.
-    - **Plataformas Personalizadas**: Soporte para sustratos rectangulares o circulares definidos por el usuario con zonas de seguridad dinámicas.
-    - **Cuadrículas Virtuales**: Generación dinámica de puntos de deposición para placas Petri y contenedores a medida.
+- **Precision Visualization**:
+    - **SBS Compliance**: Exact physical dimensions for all standard plates.
+    - **Custom Platforms**: Support for user-defined rectangular or circular substrates with dynamic safety boundaries.
+    - **Virtual Grids**: Dynamic generation of deposition points for Petri dishes and bespoke containers.
 
-- **Control de Hardware**:
-    - **Calibración Interactiva**: Homing automatizado y posicionamiento para calibración de punto cero.
-    - **Movimiento Manual (Jogging)**: Ajuste fino del eje Z y control manual del extrusor para purgado de jeringa.
-    - **Web Serial API**: Comunicación directa desde el navegador a la máquina sin necesidad de drivers externos.
+- **Hardware Control**:
+    - **Interactive Calibration**: Automated homing and positioning for Z-zero calibration.
+    - **Manual Jogging**: Fine-grained Z-axis adjustment and manual extruder control for syringe priming.
+    - **Web Serial API**: Direct browser-to-machine communication without external drivers.
 
 ---
 
-## Sustratos Soportados
+## Supported Substrates
 
-| Tipo | Formato | Características |
+| Type | Format | Features |
 | :--- | :--- | :--- |
-| **Placas Multiwell** | 6, 12, 24, 48, 96, 384 | Dimensiones estándar SBS, anclaje en A1 |
-| **Placas Petri** | 60mm, 90mm | Cuadrícula virtual centrada, margen de seguridad de 5mm |
-| **Plataformas Custom** | Rect / Círculo | Dimensiones y zonas de seguridad totalmente configurables |
-| **Portaobjetos** | 75x25mm | Cuadrícula virtual, indicación de área de cubreobjetos |
+| **Multiwell Plates** | 6, 12, 24, 48, 96, 384 | SBS Standard dimensions, A1-anchored |
+| **Petri Dishes** | 60mm, 90mm | Centered virtual grid, 5mm safety offset |
+| **Custom Platforms** | Rect / Circle | Fully configurable dimensions and safe zones |
+| **Slides** | 75x25mm | Virtual grid, cover slip area indication |
 
 ---
 
-## Notas de Uso
+## Usage Notes
 
-Este proyecto ha sido desarrollado con fines de investigación y automatización de laboratorio. Se recomienda su uso en navegadores modernos con soporte para Web Serial (Chrome, Edge, Opera).
+This project is developed for research and laboratory automation purposes. It is recommended for use in modern browsers with Web Serial support (Chrome, Edge, Opera).
