@@ -653,7 +653,7 @@ const StepSequence = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button className="btn-secondary" onClick={prevStep}><ArrowLeft size={16} /> Atrás</button>
         <button className="btn-primary" onClick={nextStep} disabled={sequenceSteps.length === 0}>
-          Generar G-code <ArrowRight size={16} />
+          Continuar <ArrowRight size={16} />
         </button>
       </div>
     </div>
