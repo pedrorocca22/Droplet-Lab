@@ -114,20 +114,19 @@ const StepExecute = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
       {/* Header actions */}
-      <div className="glass-panel" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <button className="btn-primary" onClick={handleGenerate} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="glass-panel" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <button className="btn-primary" onClick={handleGenerate}>
           <TerminalSquare size={18} /> Generar G-code
         </button>
         {gcodeGenerated && (
           <>
-            <button className="btn-secondary" onClick={handleDownload} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button className="btn-secondary" onClick={handleDownload}>
               <Download size={18} /> Exportar .gcode
             </button>
             <button
-              className="btn-primary"
+              className="btn-purple"
               onClick={handleSimulate}
               disabled={isRunning}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--accent-purple)' }}
             >
               <Play size={18} /> Simular
             </button>
@@ -136,16 +135,12 @@ const StepExecute = () => {
                 className="btn-success"
                 onClick={handleExecute}
                 disabled={isRunning}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
                 <Play size={18} /> Ejecutar en CNC
               </button>
             )}
             {isRunning && (
-              <button
-                onClick={handleCancel}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--accent-danger)', color: 'white', fontWeight: 500 }}
-              >
+              <button className="btn-danger" onClick={handleCancel}>
                 <Square size={18} /> Cancelar
               </button>
             )}
@@ -168,7 +163,7 @@ const StepExecute = () => {
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
 
         {/* G-code editor */}
-        <div className="glass-panel" style={{ flex: '1 1 420px', padding: '1.25rem' }}>
+        <div className="glass-panel" style={{ flex: '1 1 420px' }}>
           <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '1rem' }}>Editor G-code</h3>
           <textarea
             value={gcode}
@@ -184,11 +179,11 @@ const StepExecute = () => {
         </div>
 
         {/* Console log */}
-        <div className="glass-panel" style={{ flex: '0 0 320px', padding: '1.25rem' }}>
+        <div className="glass-panel" style={{ flex: '0 0 320px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <h3 style={{ fontWeight: 600, fontSize: '1rem' }}>Consola</h3>
             {log.length > 0 && (
-              <button className="btn-icon" onClick={() => setLog([])} style={{ fontSize: '0.75rem' }}>Limpiar</button>
+              <button className="btn-secondary" onClick={() => setLog([])}>Limpiar</button>
             )}
           </div>
           <div style={{
@@ -209,7 +204,7 @@ const StepExecute = () => {
       </div>
 
       {/* Summary */}
-      <div className="glass-panel" style={{ padding: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', fontSize: '0.875rem', color: 'var(--text-secondary)', alignItems: 'center' }}>
+      <div className="glass-panel" style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', fontSize: '0.875rem', color: 'var(--text-secondary)', alignItems: 'center' }}>
         <span><strong style={{ color: 'var(--text-primary)' }}>{sequenceSteps.length}</strong> paso(s)</span>
         <span><strong style={{ color: 'var(--text-primary)' }}>{[...sequenceSteps].reduce((acc, s) => acc + s.wells.size, 0)}</strong> depósitos totales</span>
         <span>Sustrato: <strong style={{ color: 'var(--text-primary)' }}>{substrate?.name}</strong></span>
@@ -222,7 +217,7 @@ const StepExecute = () => {
 
       {/* Nav */}
       <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-        <button className="btn-secondary" onClick={prevStep} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <button className="btn-secondary" onClick={prevStep}>
           <ArrowLeft size={18} /> Atrás
         </button>
       </div>

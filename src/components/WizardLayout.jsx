@@ -37,7 +37,7 @@ const WizardLayout = () => {
     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '1.5rem 2rem 4rem' }}>
 
       {/* Stepper */}
-      <div className="glass-panel" style={{ padding: '1rem 2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
+      <div className="glass-panel" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
         <div style={{ marginRight: '1.5rem', fontWeight: 700, fontSize: '1.1rem', color: 'var(--accent-primary)', letterSpacing: '-0.5px' }}>
           Droplet Lab
         </div>

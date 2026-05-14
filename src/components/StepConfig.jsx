@@ -56,7 +56,7 @@ const StepConfig = () => {
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '2rem' }}>
+    <div className="glass-panel">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Configuración del Hardware</h2>
@@ -66,7 +66,6 @@ const StepConfig = () => {
         <button 
           className={serialState.isConnected ? "btn-success" : "btn-primary"} 
           onClick={toggleConnection}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
           <Usb size={18} />
           {serialState.isConnected ? "Desconectar CNC" : "Conectar Serial"}
@@ -76,7 +75,7 @@ const StepConfig = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
         
         {/* Movimiento */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)' }}>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 500, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Zap size={18} /> Movimiento (XY/Z)</h3>
           <InputGroup label="Feedrate XY" value={config.xyFeedrate} onChange={e => handleConfigChange('xyFeedrate', parseFloat(e.target.value))} suffix="mm/min" />
           <InputGroup label="Altura Z Segura (Salto)" value={config.zSafeHeight} onChange={e => handleConfigChange('zSafeHeight', parseFloat(e.target.value))} step="0.1" suffix="mm" />
@@ -84,7 +83,7 @@ const StepConfig = () => {
         </div>
 
         {/* Extrusión */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)' }}>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 500, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Beaker size={18} /> Inyección / Jeringa</h3>
           <InputGroup label="Diámetro interno jeringa" value={config.syringeDiameter} onChange={e => handleConfigChange('syringeDiameter', parseFloat(e.target.value))} step="0.1" suffix="mm" />
           <InputGroup label="Feedrate Extrusión" value={config.extrusionFeedrate} onChange={e => handleConfigChange('extrusionFeedrate', parseFloat(e.target.value))} suffix="mm/min" />
@@ -98,7 +97,7 @@ const StepConfig = () => {
       </div>
 
       {serialState.isConnected && (
-        <div style={{ padding: '1.5rem', backgroundColor: 'rgba(139, 92, 246, 0.1)', border: '1px solid var(--accent-purple)', borderRadius: 'var(--radius-lg)', marginBottom: '2rem' }}>
+        <div className="glass-panel" style={{ background: 'rgba(139, 92, 246, 0.1)', borderColor: 'var(--accent-purple)', marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 500, color: 'var(--accent-purple)', marginBottom: '1rem' }}>Calibración Eje Z</h3>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Baje el eje Z hasta rozar el sustrato, luego fije el Z0.</p>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -122,10 +121,10 @@ const StepConfig = () => {
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button className="btn-secondary" onClick={prevStep} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <button className="btn-secondary" onClick={prevStep}>
           <ArrowLeft size={18} /> Atrás
         </button>
-        <button className="btn-primary" onClick={nextStep} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <button className="btn-primary" onClick={nextStep}>
           Continuar <ArrowRight size={18} />
         </button>
       </div>

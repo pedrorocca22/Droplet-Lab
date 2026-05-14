@@ -45,7 +45,7 @@ const StepBaseElement = () => {
   const { selectedSubstrateId, setSelectedSubstrateId, nextStep } = useWizard();
 
   return (
-    <div className="glass-panel" style={{ padding: '2rem' }}>
+    <div className="glass-panel">
       <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.25rem' }}>Seleccione el Sustrato Base</h2>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '2rem' }}>
         Elija el tipo de matriz donde se depositarán las gotas. Define el área de trabajo.

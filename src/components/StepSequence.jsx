@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWizard } from '../context/WizardContext';
 import { SUBSTRATE_TYPES, PLATE_W, PLATE_H, STEP_COLORS, STEP_COLORS_DARK, VIRTUAL_GRID_DEFAULTS } from '../utils/plateConfigs';
@@ -354,9 +354,11 @@ const StepSequence = () => {
   const [selectedWells, setSelectedWells] = useState(new Set());
   const [volume, setVolume] = useState('10');
   const [randomPercent, setRandomPercent] = useState(50);
+  const [panelHeight, setPanelHeight] = useState(null);
   const svgRef = useRef(null);
   const wellMeta = useRef({});
   const fileRef = useRef(null);
+  const plateRef = useRef(null);
 
   useEffect(() => {
     setSelectedWells(new Set());
@@ -396,6 +398,18 @@ const StepSequence = () => {
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [virtualGridParams, selectedSubstrateId]);
+
+  // Keep right panel height exactly matching the plate panel
+  useLayoutEffect(() => {
+    if (!plateRef.current) return;
+    const updateHeight = () => {
+      setPanelHeight(plateRef.current.getBoundingClientRect().height);
+    };
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(plateRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleWellClick = useCallback((id) => {
     setSelectedWells(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -493,7 +507,7 @@ const StepSequence = () => {
         const totalDefined = virtualGridParams.n * virtualGridParams.n;
         const insideCount = Object.keys(wellMeta.current).length;
         return (
-          <div className="glass-panel" style={{ padding: '0.875rem 1.5rem', display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="glass-panel" style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Cuadrícula de depósito</span>
             
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', margin: 0 }}>
@@ -517,28 +531,28 @@ const StepSequence = () => {
         );
       })()}
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'stretch' }}>
 
         {/* ── Left: SVG plate ─────────────────────────────── */}
-        <div className="glass-panel" style={{ flex: '1 1 0', minWidth: 0, padding: '1rem' }}>
+        <div ref={plateRef} className="glass-panel" style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {/* Plate toolbar */}
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem', alignItems: 'center' }}>
             <span style={{ fontWeight: 600, fontSize: '0.95rem', marginRight: 'auto' }}>{substrate.name}</span>
-            <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={selectAll}>Sel. todo</button>
-            <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={() => setSelectedWells(new Set())}>Limpiar sel.</button>
+            <button className="btn-secondary" onClick={selectAll}>Sel. todo</button>
+            <button className="btn-secondary" onClick={() => setSelectedWells(new Set())}>Limpiar sel.</button>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <input type="number" min={0} max={100} step={1} value={randomPercent}
                 onChange={e => setRandomPercent(parseInt(e.target.value) || 0)}
                 style={{ width: '44px', padding: '0.2rem 0.3rem', fontSize: '0.78rem', textAlign: 'center' }} />
               <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>%</span>
-              <button className="btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }} onClick={() => selectRandom(randomPercent)}>Aleatorio</button>
+              <button className="btn-secondary" onClick={() => selectRandom(randomPercent)}>Aleatorio</button>
             </div>
           </div>
 
           {/* SVG — drag-selectable */}
-          <div style={{ overflow: 'hidden', cursor: 'crosshair' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'crosshair', backgroundColor: '#fdfdfd', borderRadius: 6, border: '1px solid var(--border-color)' }}>
             <svg ref={svgRef} viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%"
-              style={{ display: 'block', userSelect: 'none' }}
+              style={{ display: 'block', userSelect: 'none', maxHeight: '100%' }}
               onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}>
               <PlateRenderer substrate={substrate} selectedWells={selectedWells}
                 stepWells={stepWells} stepVolumes={sequenceSteps.map(s => s.volume)}
@@ -552,17 +566,17 @@ const StepSequence = () => {
           </div>
 
           {/* Status bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.75rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
             <span><b style={{ color: 'var(--accent-primary)' }}>{selectedWells.size}</b> seleccionado(s)</span>
             <span>{lockedWells.size} en secuencia · {availableWells} disponibles</span>
           </div>
         </div>
 
         {/* ── Right: Sequence panel ────────────────────────── */}
-        <div style={{ flex: '0 0 360px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ flex: '0 0 360px', display: 'flex', flexDirection: 'column', gap: '0.75rem', height: panelHeight ? `${panelHeight}px` : 'auto', maxHeight: panelHeight ? `${panelHeight}px` : 'none' }}>
 
           {/* Add step */}
-          <div className="glass-panel" style={{ padding: '1rem' }}>
+          <div className="glass-panel">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               <Droplets size={16} color="var(--accent-primary)" />
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Añadir Paso</span>
@@ -581,7 +595,7 @@ const StepSequence = () => {
           </div>
 
           {/* Sequence list */}
-          <div className="glass-panel" style={{ padding: '1rem', flex: 1 }}>
+          <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem', gap: '0.5rem' }}>
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Secuencia</span>
               <span className="badge" style={{ whiteSpace: 'nowrap' }}>{sequenceSteps.length}p · {totalDeposits}dep.</span>
@@ -592,14 +606,14 @@ const StepSequence = () => {
                   <button className="btn-icon" title="Guardar JSON" onClick={saveJSON}><Download size={13} /></button>
                 )}
                 {sequenceSteps.length > 0 && (
-                  <button className="btn-icon" title="Borrar todo" onClick={clearAll} style={{ color: 'var(--accent-danger)', borderColor: '#fca5a5' }}>
+                  <button className="btn-icon-danger" title="Borrar todo" onClick={clearAll}>
                     <Trash2 size={13} />
                   </button>
                 )}
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: 380, overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '1mm' }}>
               <AnimatePresence>
                 {sequenceSteps.length === 0 && (
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '1.5rem 0' }}>
@@ -619,9 +633,9 @@ const StepSequence = () => {
                         <span style={{ fontWeight: 700, fontSize: '0.85rem', color: darkColor }}>Paso {i + 1}</span>
                         <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', flexShrink: 0 }}>{step.wells.size} poz.</span>
                         <div style={{ marginLeft: 'auto', display: 'flex', gap: '2px', flexShrink: 0 }}>
-                          <button className="btn-icon" style={{ width: 22, height: 22 }} onClick={() => moveStep(i, -1)} disabled={i === 0}><ChevronUp size={11} /></button>
-                          <button className="btn-icon" style={{ width: 22, height: 22 }} onClick={() => moveStep(i, 1)} disabled={i === sequenceSteps.length - 1}><ChevronDown size={11} /></button>
-                          <button className="btn-icon" style={{ width: 22, height: 22, color: 'var(--accent-danger)', borderColor: '#fca5a5' }} onClick={() => deleteStep(step.id)}><Trash2 size={10} /></button>
+                          <button className="btn-icon" onClick={() => moveStep(i, -1)} disabled={i === 0}><ChevronUp size={11} /></button>
+                          <button className="btn-icon" onClick={() => moveStep(i, 1)} disabled={i === sequenceSteps.length - 1}><ChevronDown size={11} /></button>
+                          <button className="btn-icon-danger" onClick={() => deleteStep(step.id)}><Trash2 size={10} /></button>
                         </div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.45rem' }}>
