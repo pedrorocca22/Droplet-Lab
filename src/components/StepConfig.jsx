@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useWizard } from '../context/WizardContext';
 import { connectSerial, disconnectSerial, sendLineAndWaitForOk } from '../utils/serialCommunication';
-import { ArrowLeft, ArrowRight, Usb, Zap, Beaker } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Zap, Beaker } from 'lucide-react';
 
 const InputGroup = ({ label, value, onChange, type = "number", step = "1", suffix }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -28,21 +28,6 @@ const StepConfig = () => {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
 
-  const toggleConnection = async () => {
-    if (!serialState.isConnected) {
-      try {
-        const { port, writer, serialReader, readBuffer } = await connectSerial();
-        setSerialState({ isConnected: true, port, writer, serialReader, readBuffer });
-        setStatusMsg("Conectado correctamente.");
-      } catch (err) {
-        setStatusMsg("Error: " + err.message);
-      }
-    } else {
-      await disconnectSerial(serialState.port, serialState.writer, serialState.serialReader);
-      setSerialState({ isConnected: false, port: null, writer: null, serialReader: null, readBuffer: "" });
-      setStatusMsg("Desconectado.");
-    }
-  };
 
   const handleJogZ = async (val) => {
     if (!serialState.isConnected) return;
@@ -62,14 +47,6 @@ const StepConfig = () => {
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Configuración del Hardware</h2>
           <p style={{ color: 'var(--text-secondary)' }}>Ajuste los parámetros físicos de la inyección y el movimiento de los ejes.</p>
         </div>
-        
-        <button 
-          className={serialState.isConnected ? "btn-success" : "btn-primary"} 
-          onClick={toggleConnection}
-        >
-          <Usb size={18} />
-          {serialState.isConnected ? "Desconectar CNC" : "Conectar Serial"}
-        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>

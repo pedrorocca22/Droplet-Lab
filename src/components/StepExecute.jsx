@@ -163,34 +163,39 @@ const StepExecute = () => {
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
 
         {/* G-code editor */}
-        <div className="glass-panel" style={{ flex: '1 1 420px' }}>
-          <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '1rem' }}>Editor G-code</h3>
-          <textarea
-            value={gcode}
-            onChange={e => setGcode(e.target.value)}
-            placeholder="El G-code generado aparecerá aquí. También puede editarlo manualmente o cargar un archivo."
-            style={{
-              width: '100%', minHeight: '360px', resize: 'vertical',
-              fontFamily: "'Courier New', monospace", fontSize: '0.8rem', lineHeight: 1.6,
-              backgroundColor: '#070d1a', color: '#94a3b8', border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)', padding: '1rem'
-            }}
-          />
+        <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', height: '32px', marginBottom: '0.75rem' }}>
+            <h3 style={{ fontWeight: 600, fontSize: '1rem' }}>Editor G-code</h3>
+          </div>
+          <div style={{ backgroundColor: '#070d1a', borderRadius: '4px', height: '480px', overflow: 'hidden' }}>
+            <textarea
+              value={gcode}
+              onChange={e => setGcode(e.target.value)}
+              placeholder="El G-code generado aparecerá aquí..."
+              style={{
+                width: '100%', height: '100%', resize: 'none',
+                fontFamily: "'Courier New', monospace", fontSize: '0.8rem', lineHeight: 1.6,
+                backgroundColor: 'transparent', color: '#94a3b8', border: 'none',
+                outline: 'none', padding: '1rem 1.25rem 1rem 1rem'
+              }}
+            />
+          </div>
         </div>
 
         {/* Console log */}
-        <div className="glass-panel" style={{ flex: '0 0 320px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+        <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '32px', marginBottom: '0.75rem' }}>
             <h3 style={{ fontWeight: 600, fontSize: '1rem' }}>Consola</h3>
             {log.length > 0 && (
-              <button className="btn-secondary" onClick={() => setLog([])}>Limpiar</button>
+              <button className="btn-secondary" style={{ padding: '0.2rem 0.75rem', fontSize: '0.75rem' }} onClick={() => setLog([])}>Limpiar</button>
             )}
           </div>
           <div style={{
-            minHeight: '360px', maxHeight: '360px', overflowY: 'auto',
-            backgroundColor: '#070d1a', borderRadius: 'var(--radius-md)',
-            padding: '0.75rem', fontFamily: "'Courier New', monospace", fontSize: '0.75rem',
-            border: '1px solid var(--border-color)'
+            height: '480px', overflowY: 'auto',
+            backgroundColor: '#070d1a', borderRadius: '4px',
+            padding: '1rem 1.25rem 1rem 1rem', 
+            fontFamily: "'Courier New', monospace", fontSize: '0.75rem',
+            border: 'none'
           }}>
             {log.length === 0 && <span style={{ color: '#475569' }}>Sin mensajes…</span>}
             {log.map((entry, i) => (
