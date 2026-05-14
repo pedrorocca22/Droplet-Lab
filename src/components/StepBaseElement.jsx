@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useWizard } from '../context/WizardContext';
 import { SUBSTRATE_TYPES } from '../utils/plateConfigs';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { PLATE_W, PLATE_H } from '../utils/plateConfigs';
 
 const PreviewSVG = ({ substrate }) => {
@@ -42,7 +42,7 @@ const PreviewSVG = ({ substrate }) => {
 };
 
 const StepBaseElement = () => {
-  const { selectedSubstrateId, setSelectedSubstrateId, nextStep } = useWizard();
+  const { selectedSubstrateId, setSelectedSubstrateId, nextStep, prevStep } = useWizard();
 
   return (
     <div className="glass-panel">
@@ -74,8 +74,13 @@ const StepBaseElement = () => {
         })}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button className="btn-primary" onClick={nextStep}>Continuar <ArrowRight size={16} /></button>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button className="btn-secondary" onClick={prevStep}>
+          <ArrowLeft size={16} /> Atrás
+        </button>
+        <button className="btn-primary" onClick={nextStep}>
+          Continuar <ArrowRight size={16} />
+        </button>
       </div>
     </div>
   );

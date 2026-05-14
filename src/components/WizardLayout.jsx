@@ -1,17 +1,19 @@
 import React from 'react';
 import { useWizard } from '../context/WizardContext';
-import { Beaker, Settings, List, Play } from 'lucide-react';
+import { User, Beaker, Settings, List, Play } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import StepLogin from './StepLogin';
 import StepBaseElement from './StepBaseElement';
 import StepConfig from './StepConfig';
 import StepSequence from './StepSequence';
 import StepExecute from './StepExecute';
 
 const STEPS = [
-  { num: 1, title: 'Sustrato', icon: Beaker },
-  { num: 2, title: 'Configuración', icon: Settings },
-  { num: 3, title: 'Secuencia', icon: List },
-  { num: 4, title: 'Ejecución', icon: Play },
+  { num: 1, title: 'Login', icon: User },
+  { num: 2, title: 'Sustrato', icon: Beaker },
+  { num: 3, title: 'Configuración', icon: Settings },
+  { num: 4, title: 'Secuencia', icon: List },
+  { num: 5, title: 'Ejecución', icon: Play },
 ];
 
 const stepVariants = {
@@ -25,11 +27,12 @@ const WizardLayout = () => {
 
   const renderStep = () => {
     switch (currentStep) {
-      case 1: return <StepBaseElement />;
-      case 2: return <StepConfig />;
-      case 3: return <StepSequence />;
-      case 4: return <StepExecute />;
-      default: return <StepBaseElement />;
+      case 1: return <StepLogin />;
+      case 2: return <StepBaseElement />;
+      case 3: return <StepConfig />;
+      case 4: return <StepSequence />;
+      case 5: return <StepExecute />;
+      default: return <StepLogin />;
     }
   };
 

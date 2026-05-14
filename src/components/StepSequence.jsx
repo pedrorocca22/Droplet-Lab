@@ -109,37 +109,28 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
           </g>
         );
 
-        // Individual label above each well
-        labels.push(
-          <text key={`lbl-${id}`}
-            x={cx} y={cy - r - 0.5}
-            fontSize={labelFontSize} fill="#94a3b8"
-            textAnchor="middle" dominantBaseline="auto"
-            style={{ pointerEvents: 'none', userSelect: 'none' }}>
-            {id}
+        // Unified centered text (Nomenclature or Volume)
+        const isAssigned = stepIdx !== undefined;
+        const centeredText = isAssigned ? `${stepVolumes[stepIdx]}µL` : id;
+        const textColor = isAssigned ? darkC : "#94a3b8";
+        const fs = isAssigned ? Math.min(r * 0.42, 3.5) : Math.min(r * 0.48, 3.0);
+
+        volTexts.push(
+          <text key={`txt-${id}`} x={cx} y={cy}
+            fontSize={fs} fill={textColor} textAnchor="middle" dominantBaseline="middle"
+            fontWeight={isAssigned ? "600" : "400"}
+            style={{ pointerEvents: 'none', userSelect: 'none', opacity: isAssigned ? 1 : 0.8 }}>
+            {centeredText}
           </text>
         );
-
-        // Volume text inside well (only if r >= 3mm)
-        if (stepIdx !== undefined && r >= 3) {
-          volTexts.push(
-            <text key={`vt-${id}`} x={cx} y={cy}
-              fontSize={Math.min(r * 0.42, 3.5)}
-              fill={darkC} textAnchor="middle" dominantBaseline="middle"
-              fontWeight="600" style={{ pointerEvents: 'none', userSelect: 'none' }}>
-              {stepVolumes[stepIdx]}µL
-            </text>
-          );
-        }
       }
     }
 
     return (
       <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
-        <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f8fafc" stroke="#e2e8f0" strokeWidth={0.5} />
-        <path d={`M${PLATE_W - 8},0 L${PLATE_W},0 L${PLATE_W},8 Z`} fill="#e2e8f0" />
+        <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f4f6f9" stroke="#94a3b8" strokeWidth={1} />
+        <path d={`M${PLATE_W - 8},0 L${PLATE_W},0 L${PLATE_W},8 Z`} fill="#cbd5e1" />
         {wells}
-        {labels}
         {volTexts}
       </svg>
     );
@@ -191,33 +182,31 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
             <circle cx={wx} cy={wy} r={dotR} fill={fill} stroke="none" />
           </g>
         );
-        labels.push(
-          <text key={`lbl-${id}`} x={wx} y={wy - dotR - 0.5}
-            fontSize={labelFs} fill="#94a3b8" textAnchor="middle" dominantBaseline="auto"
-            style={{ pointerEvents: 'none', userSelect: 'none' }}>{id}</text>
+        const isAssigned = stepIdx !== undefined;
+        const centeredText = isAssigned ? `${stepVolumes[stepIdx]}µL` : id;
+        const textColor = isAssigned ? darkC : "#94a3b8";
+        const fs = isAssigned ? Math.min(dotR * 0.55, 3.5) : Math.min(dotR * 0.6, 3.2);
+
+        volTexts.push(
+          <text key={`txt-${id}`} x={wx} y={wy}
+            fontSize={fs} fill={textColor} textAnchor="middle" dominantBaseline="middle"
+            fontWeight={isAssigned ? "600" : "400"}
+            style={{ pointerEvents: 'none', userSelect: 'none', opacity: isAssigned ? 1 : 0.8 }}>
+            {centeredText}
+          </text>
         );
-        if (stepIdx !== undefined && dotR >= 2.5) {
-          volTexts.push(
-            <text key={`vt-${id}`} x={wx} y={wy}
-              fontSize={Math.min(dotR * 0.55, 3.5)} fill={darkC}
-              textAnchor="middle" dominantBaseline="middle" fontWeight="600"
-              style={{ pointerEvents: 'none', userSelect: 'none' }}>
-              {stepVolumes[stepIdx]}µL
-            </text>
-          );
-        }
       }
     }
 
     return (
       <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
-        <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f8fafc" stroke="#e2e8f0" strokeWidth={0.5} />
         {/* Main Petri perimeter */}
         <circle cx={cx} cy={cy} r={displayR} fill="#f4f6f9" stroke="#94a3b8" strokeWidth={1} />
         {/* Safety offset boundary (dashed) */}
         <circle cx={cx} cy={cy} r={safeDisplayR} fill="none"
           stroke="#cbd5e1" strokeWidth={0.3} strokeDasharray="1 1" />
-        {points}{labels}{volTexts}
+        {points}
+        {volTexts}
       </svg>
     );
   }
@@ -271,27 +260,24 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
             <circle cx={wx} cy={wy} r={dotR} fill={fill} stroke="none" />
           </g>
         );
-        labels.push(
-          <text key={`lbl-${id}`} x={wx} y={wy - dotR - 0.5}
-            fontSize={labelFs} fill="#94a3b8" textAnchor="middle" dominantBaseline="auto"
-            style={{ pointerEvents: 'none', userSelect: 'none' }}>{id}</text>
+        const isAssigned = stepIdx !== undefined;
+        const centeredText = isAssigned ? `${stepVolumes[stepIdx]}µL` : id;
+        const textColor = isAssigned ? darkC : "#94a3b8";
+        const fs = isAssigned ? Math.min(dotR * 0.55, 3) : Math.min(dotR * 0.6, 2.8);
+
+        volTexts.push(
+          <text key={`txt-${id}`} x={wx} y={wy}
+            fontSize={fs} fill={textColor} textAnchor="middle" dominantBaseline="middle"
+            fontWeight={isAssigned ? "600" : "400"}
+            style={{ pointerEvents: 'none', userSelect: 'none', opacity: isAssigned ? 1 : 0.8 }}>
+            {centeredText}
+          </text>
         );
-        if (stepIdx !== undefined && dotR >= 2) {
-          volTexts.push(
-            <text key={`vt-${id}`} x={wx} y={wy}
-              fontSize={Math.min(dotR * 0.55, 3)} fill={darkC}
-              textAnchor="middle" dominantBaseline="middle" fontWeight="600"
-              style={{ pointerEvents: 'none', userSelect: 'none' }}>
-              {stepVolumes[stepIdx]}µL
-            </text>
-          );
-        }
       }
     }
 
     return (
       <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
-        <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f8fafc" stroke="#e2e8f0" strokeWidth={0.5} />
         {/* Main Slide Body */}
         <rect x={sx} y={sy} width={width * scale} height={height * scale} rx={1} fill="#eef2f7" stroke="#94a3b8" strokeWidth={1} />
         {/* Safety offset boundary (dashed) */}
@@ -301,7 +287,8 @@ const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWel
         <rect x={sx + width * scale * 0.7} y={sy} width={width * scale * 0.3} height={height * scale}
           rx={1} fill="rgba(219,234,254,0.5)" stroke="#bfdbfe" strokeWidth={0.4} />
         <text x={sx + width * scale * 0.85} y={sy + height * scale + 3} fontSize={2} fill="#93c5fd" textAnchor="middle">cover slip</text>
-        {points}{labels}{volTexts}
+        {points}
+        {volTexts}
       </svg>
     );
   }
@@ -550,7 +537,7 @@ const StepSequence = () => {
           </div>
 
           {/* SVG — drag-selectable */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'crosshair', backgroundColor: '#fdfdfd', borderRadius: 6, border: '1px solid var(--border-color)', minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'crosshair', minHeight: 0 }}>
             <svg ref={svgRef} viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%"
               style={{ display: 'block', userSelect: 'none', maxHeight: '100%' }}
               onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}>

@@ -8,14 +8,17 @@ export const useWizard = () => useContext(WizardContext);
 export const WizardProvider = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(1);
   
-  // State for Substrate Selection (Step 1)
+  // User Data (New Step 1)
+  const [userData, setUserData] = useState({ firstName: '', lastName: '' });
+
+  // State for Substrate Selection (Step 2)
   const [selectedSubstrateId, setSelectedSubstrateId] = useState(SUBSTRATE_TYPES.PLATE_96.id);
   const [virtualGridParams, setVirtualGridParams] = useState({ n: 6, pitch: 10 });
 
-  // State for Configuration (Step 2)
+  // State for Configuration (Step 3)
   const [config, setConfig] = useState(DEFAULT_CONFIG);
 
-  // State for Sequence (Step 3)
+  // State for Sequence (Step 4)
   const [sequenceSteps, setSequenceSteps] = useState([]);
   const [lockedWells, setLockedWells] = useState(new Set());
 
@@ -26,7 +29,7 @@ export const WizardProvider = ({ children }) => {
     writer: null
   });
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4));
+  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
   const goToStep = (step) => setCurrentStep(step);
 
@@ -35,6 +38,7 @@ export const WizardProvider = ({ children }) => {
   return (
     <WizardContext.Provider value={{
       currentStep, nextStep, prevStep, goToStep,
+      userData, setUserData,
       selectedSubstrateId, setSelectedSubstrateId,
       virtualGridParams, setVirtualGridParams,
       getSubstrateInfo,
