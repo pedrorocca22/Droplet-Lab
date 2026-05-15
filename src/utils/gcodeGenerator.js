@@ -15,6 +15,63 @@ export const getWellCoordinates = (wellId, currentRows, currentCols, currentPitc
     return { x: targetX, y: targetY };
 }
 
+
+export const optimizeRouteNearestNeighbor = (wells, rows, cols, pitchX, pitchY, startX, startY) => {
+  if (wells.length <= 2) return wells;
+
+  const wellCoords = {};
+  wells.forEach(w => {
+    const coords = getWellCoordinates(w, rows, cols, pitchX, pitchY, startX, startY);
+    if (coords) wellCoords[w] = coords;
+  });
+
+  const unvisited = [...wells];
+  const route = [];
+  
+  // Start from the first well
+  let current = unvisited.shift();
+  route.push(current);
+
+  while (unvisited.length > 0) {
+    const currentCoords = wellCoords[current];
+    if (!currentCoords) {
+      current = unvisited.shift();
+      route.push(current);
+      continue;
+    }
+
+    // Find nearest unvisited well
+    let nearest = null;
+    let nearestDist = Infinity;
+    
+    for (const well of unvisited) {
+      const wellCoords2 = wellCoords[well];
+      if (!wellCoords2) continue;
+      
+      const dist = Math.sqrt(
+        Math.pow(wellCoords2.x - currentCoords.x, 2) + 
+        Math.pow(wellCoords2.y - currentCoords.y, 2)
+      );
+      
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearest = well;
+      }
+    }
+
+    if (nearest) {
+      route.push(nearest);
+      unvisited.splice(unvisited.indexOf(nearest), 1);
+      current = nearest;
+    } else {
+      current = unvisited.shift();
+      route.push(current);
+    }
+  }
+
+  return route;
+};
+
 export const generateGcode = (sequenceSteps, config, substrateInfo, virtualGridParams) => {
     if (!sequenceSteps || sequenceSteps.length === 0) return "";
 
@@ -58,7 +115,12 @@ export const generateGcode = (sequenceSteps, config, substrateInfo, virtualGridP
 
     for (let stepIndex = 0; stepIndex < sequenceSteps.length; stepIndex++) {
         const step = sequenceSteps[stepIndex];
-        const wellsInStep = Array.from(step.wells);
+        let wellsInStep = Array.from(step.wells);
+        
+        // Optimize route if strategy is nearest-neighbor
+        if (config.routeStrategy === 'nearest') {
+            wellsInStep = optimizeRouteNearestNeighbor(wellsInStep, rows, cols, pitchX, pitchY, startX, startY);
+        }
 
         const volumeMicroLiters = step.volume; 
         const volumeCubicMm = volumeMicroLiters; 

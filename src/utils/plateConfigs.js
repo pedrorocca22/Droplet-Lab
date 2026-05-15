@@ -58,6 +58,10 @@ export const SUBSTRATE_TYPES = {
   SLIDE: {
     id: 'SLIDE', type: 'slide', name: 'Portaobjetos',
     isVirtualGrid: true, width: 75, height: 25
+  },
+  CUSTOM: {
+    id: 'CUSTOM', type: 'custom', name: 'Personalizado',
+    isVirtualGrid: true
   }
 };
 
@@ -91,5 +95,6 @@ export const DEFAULT_CONFIG = {
   retractionSpeed: 1800,
   postExtrusionPause: 100,
   customPreGcode: 'G28 X Y Z\nM82',
-  customPostGcode: 'G0 X0 Y0\nM84'
+  customPostGcode: 'G0 X0 Y0\nM84',
+  routeStrategy: 'nearest' // 'nearest' = nearest-neighbor, 'manual' = selection order
 };
