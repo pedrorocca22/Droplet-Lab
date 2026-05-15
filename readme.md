@@ -1,7 +1,4 @@
 
-
-https://github.com/user-attachments/assets/4317fed2-0f8a-4033-9161-ba7a7c95734b
-
 # Droplet Lab
 
 **Control Interface for Precision Biomaterial Deposition**
@@ -46,6 +43,8 @@ Droplet Lab is a professional web application designed to orchestrate the deposi
 | **Petri Dishes** | 60mm, 90mm | Centered virtual grid, 5mm safety offset |
 | **Custom Platforms** | Rect / Circle | Fully configurable dimensions and safe zones |
 | **Slides** | 75x25mm | Virtual grid, cover slip area indication |
+
+https://github.com/user-attachments/assets/4317fed2-0f8a-4033-9161-ba7a7c95734b
 
 ---
 
