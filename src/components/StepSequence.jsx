@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback, useEffect, useLayoutEffect } from
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWizard } from '../context/WizardContext';
 import { SUBSTRATE_TYPES, PLATE_W, PLATE_H, STEP_COLORS, STEP_COLORS_DARK, VIRTUAL_GRID_DEFAULTS } from '../utils/plateConfigs';
-import { ArrowLeft, ArrowRight, Plus, Trash2, Download, Upload, Droplets, ChevronUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Plus, Trash2, Download, Upload, Droplets, ChevronUp, ChevronDown, Square, CheckCircle } from 'lucide-react';
 
 // ── Well ID helpers ──────────────────────────────────────────────
 const rowChar = r => String.fromCharCode(65 + r);
@@ -61,152 +61,135 @@ const computeValidWellIds = (substrate, virtualParams) => {
 
 // ── Plate SVG Renderer ───────────────────────────────────────────
 // Uses physical mm as SVG units (viewBox = plate dimensions)
-const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWellClick, wellMeta, virtualParams }) => {
+const PlateRenderer = ({ substrate, selectedWells, stepWells, stepVolumes, onWellClick, wellMeta, virtualParams, customSubstrateParams, simState }) => {
   const { type } = substrate;
-  const PLATE_RX = 3; // corner radius mm
+  const PLATE_RX = 3;
 
-  if (type === 'multiwell') {
+  const isSimActive = simState?.active;
+  const currentWellId = simState?.currentWell?.wellId;
+  const depositedWells = simState?.depositedWells; // corner radius mm
+
+  
+  const renderWell = (id, cx, cy, r, stepIdx, wellMetaRef) => {
+    const isCurrentWell = isSimActive && currentWellId === id;
+    const isDeposited = isSimActive && depositedWells?.has(id);
+    const stepColor = stepIdx !== undefined ? STEP_COLORS[stepIdx % STEP_COLORS.length] : null;
+    const darkC = stepIdx !== undefined ? STEP_COLORS_DARK[stepIdx % STEP_COLORS_DARK.length] : null;
+    const isSelected = selectedWells.has(id);
+    const isLocked = stepColor !== null;
+
+    let fill;
+    let stroke = 'none';
+    let strokeWidth = 0;
+
+    if (isCurrentWell) {
+      fill = stepColor || '#3b82f6';
+      stroke = '#fff';
+      strokeWidth = 0.8;
+    } else if (isDeposited) {
+      fill = '#94a3b8';
+    } else if (stepColor) {
+      fill = stepColor;
+    } else if (isSelected) {
+      fill = '#93c5fd';
+    } else {
+      fill = '#dde3ea';
+    }
+
+    if (wellMetaRef) wellMetaRef.current[id] = { cx, cy, r };
+
+    const textContent = isDeposited ? '' : (stepIdx !== undefined ? stepVolumes[stepIdx] + '\u00b5L' : id);
+    const textColor = isDeposited ? '#64748b' : (stepIdx !== undefined ? darkC : '#94a3b8');
+    const textFs = stepIdx !== undefined ? Math.min(r * 0.42, 3.5) : Math.min(r * 0.48, 3.0);
+
+    return (
+      <g key={id} onClick={() => !isLocked && onWellClick && onWellClick(id)} style={{ cursor: isLocked ? 'default' : 'pointer' }}>
+        {isCurrentWell ? (
+          <motion.circle
+            cx={cx} cy={cy} r={r}
+            fill={fill} stroke={stroke} strokeWidth={strokeWidth}
+            animate={{ scale: [1, 1.18, 1], opacity: [1, 0.85, 1] }}
+            transition={{ duration: 0.5, repeat: Infinity }}
+            style={{ transformOrigin: cx + 'px ' + cy + 'px' }}
+          />
+        ) : (
+          <circle cx={cx} cy={cy} r={r} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+        )}
+        {textContent && (
+          <text x={cx} y={cy}
+            fontSize={textFs} fill={textColor} textAnchor="middle" dominantBaseline="middle"
+            fontWeight={stepIdx !== undefined ? "600" : "400"}
+            style={{ pointerEvents: 'none', userSelect: 'none', opacity: stepIdx !== undefined ? 1 : 0.8 }}>
+            {textContent}
+          </text>
+        )}
+      </g>
+    );
+  };
+
+if (type === 'multiwell') {
     const { rows, cols, pitch, wellDiameter, a1 } = substrate;
     const r = wellDiameter / 2;
 
-    const getWellColor = (id) => {
-      for (let i = 0; i < stepWells.length; i++) {
-        if (stepWells[i].has(id)) return STEP_COLORS[i % STEP_COLORS.length];
-      }
-      return null;
-    };
-
-    // Compute step index for each well so we can look up volume
     const wellStepMap = {};
     stepWells.forEach((wset, i) => wset.forEach(id => { wellStepMap[id] = i; }));
 
-    const wells = [];
-    const labels = [];
-    const volTexts = [];
-    const labelFontSize = Math.min(2.2, pitch * 0.22);
-
+    const elements = [];
     for (let ri = 0; ri < rows; ri++) {
       for (let ci = 0; ci < cols; ci++) {
         const id = wellId(ri, ci);
         const cx = a1.x + ci * pitch;
         const cy = a1.y + ri * pitch;
-        if (wellMeta) wellMeta.current[id] = { cx, cy, r };
-
         const stepIdx = wellStepMap[id];
-        const stepColor = stepIdx !== undefined ? STEP_COLORS[stepIdx % STEP_COLORS.length] : null;
-        const darkC = stepIdx !== undefined ? STEP_COLORS_DARK[stepIdx % STEP_COLORS_DARK.length] : null;
-        const isSelected = selectedWells.has(id);
-        const isLocked = stepColor !== null;
-
-        let fill;
-        if (stepColor)       fill = stepColor;
-        else if (isSelected) fill = '#93c5fd';
-        else                 fill = '#dde3ea';
-
-        wells.push(
-          <g key={id} onClick={() => !isLocked && onWellClick(id)} style={{ cursor: isLocked ? 'default' : 'pointer' }}>
-            <circle cx={cx} cy={cy} r={r} fill={fill} stroke="none" />
-          </g>
-        );
-
-        // Unified centered text (Nomenclature or Volume)
-        const isAssigned = stepIdx !== undefined;
-        const centeredText = isAssigned ? `${stepVolumes[stepIdx]}µL` : id;
-        const textColor = isAssigned ? darkC : "#94a3b8";
-        const fs = isAssigned ? Math.min(r * 0.42, 3.5) : Math.min(r * 0.48, 3.0);
-
-        volTexts.push(
-          <text key={`txt-${id}`} x={cx} y={cy}
-            fontSize={fs} fill={textColor} textAnchor="middle" dominantBaseline="middle"
-            fontWeight={isAssigned ? "600" : "400"}
-            style={{ pointerEvents: 'none', userSelect: 'none', opacity: isAssigned ? 1 : 0.8 }}>
-            {centeredText}
-          </text>
-        );
+        elements.push(renderWell(id, cx, cy, r, stepIdx, wellMeta));
       }
     }
 
     return (
-      <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
+      <svg viewBox={'0 0 ' + PLATE_W + ' ' + PLATE_H} width="100%" style={{ display: 'block' }}>
         <rect x={0} y={0} width={PLATE_W} height={PLATE_H} rx={PLATE_RX} fill="#f4f6f9" stroke="#94a3b8" strokeWidth={1} />
-        <path d={`M${PLATE_W - 8},0 L${PLATE_W},0 L${PLATE_W},8 Z`} fill="#cbd5e1" />
-        {wells}
-        {volTexts}
+        <path d={'M' + (PLATE_W - 8) + ',0 L' + PLATE_W + ',0 L' + PLATE_W + ',8 Z'} fill="#cbd5e1" />
+        {elements}
       </svg>
     );
   }
 
   if (type === 'petri') {
-    const physR   = substrate.diameter / 2;        // usable radius in mm
-    const safeR   = physR - 5;                     // 5mm safety offset from wall
+    const physR   = substrate.diameter / 2;
+    const safeR   = physR - 5;
     const cx = PLATE_W / 2, cy = PLATE_H / 2;
     const displayR = Math.min(PLATE_W, PLATE_H) * 0.44;
-    const scale    = displayR / physR;             // SVG units per mm
-    const safeDisplayR = safeR * scale;            // safe zone in SVG units
+    const scale    = displayR / physR;
+    const safeDisplayR = safeR * scale;
 
     const { n, pitch } = virtualParams;
     const dotR    = pitch * scale * 0.28;
-    const labelFs = Math.max(pitch * scale * 0.2, 1.5);
 
     const wellStepMap = {};
     stepWells.forEach((wset, i) => wset.forEach(id => { wellStepMap[id] = i; }));
 
-    const points = [], labels = [], volTexts = [];
-
+    const elements = [];
     for (let ri = 0; ri < n; ri++) {
       for (let ci = 0; ci < n; ci++) {
         const id = wellId(ri, ci);
-        // Physical offset from dish center (mm), grid centered at 0,0
         const physX = -(n - 1) * pitch / 2 + ci * pitch;
         const physY = -(n - 1) * pitch / 2 + ri * pitch;
         const dist  = Math.sqrt(physX * physX + physY * physY);
-
-        // Exclude points whose center is within 5mm of the dish wall
         if (dist > safeR) continue;
 
         const wx = cx + physX * scale;
         const wy = cy + physY * scale;
-
-        const stepIdx  = wellStepMap[id];
-        const stepColor = stepIdx !== undefined ? STEP_COLORS[stepIdx % STEP_COLORS.length] : null;
-        const darkC     = stepIdx !== undefined ? STEP_COLORS_DARK[stepIdx % STEP_COLORS_DARK.length] : null;
-        const isSel     = selectedWells.has(id);
-        const isLocked  = stepColor !== null;
-        const fill      = stepColor || (isSel ? '#93c5fd' : '#dde3ea');
-
-        wellMeta.current[id] = { cx: wx, cy: wy, r: dotR };
-
-        points.push(
-          <g key={id} onClick={() => !isLocked && onWellClick(id)}
-            style={{ cursor: isLocked ? 'default' : 'pointer' }}>
-            <circle cx={wx} cy={wy} r={dotR} fill={fill} stroke="none" />
-          </g>
-        );
-        const isAssigned = stepIdx !== undefined;
-        const centeredText = isAssigned ? `${stepVolumes[stepIdx]}µL` : id;
-        const textColor = isAssigned ? darkC : "#94a3b8";
-        const fs = isAssigned ? Math.min(dotR * 0.55, 3.5) : Math.min(dotR * 0.6, 3.2);
-
-        volTexts.push(
-          <text key={`txt-${id}`} x={wx} y={wy}
-            fontSize={fs} fill={textColor} textAnchor="middle" dominantBaseline="middle"
-            fontWeight={isAssigned ? "600" : "400"}
-            style={{ pointerEvents: 'none', userSelect: 'none', opacity: isAssigned ? 1 : 0.8 }}>
-            {centeredText}
-          </text>
-        );
+        const stepIdx = wellStepMap[id];
+        elements.push(renderWell(id, wx, wy, dotR, stepIdx, wellMeta));
       }
     }
 
     return (
-      <svg viewBox={`0 0 ${PLATE_W} ${PLATE_H}`} width="100%" style={{ display: 'block' }}>
-        {/* Main Petri perimeter */}
+      <svg viewBox={'0 0 ' + PLATE_W + ' ' + PLATE_H} width="100%" style={{ display: 'block' }}>
         <circle cx={cx} cy={cy} r={displayR} fill="#f4f6f9" stroke="#94a3b8" strokeWidth={1} />
-        {/* Safety offset boundary (dashed) */}
         <circle cx={cx} cy={cy} r={safeDisplayR} fill="none"
           stroke="#cbd5e1" strokeWidth={0.3} strokeDasharray="1 1" />
-        {points}
-        {volTexts}
+        {elements}
       </svg>
     );
   }
@@ -336,12 +319,13 @@ const useDragSelect = (svgRef, wellMeta, lockedWells, selectedWells, setSelected
 
 // ── Main Component ───────────────────────────────────────────────
 const StepSequence = () => {
-  const { selectedSubstrateId, sequenceSteps, setSequenceSteps, lockedWells, setLockedWells, virtualGridParams, setVirtualGridParams, nextStep, prevStep } = useWizard();
+  const { selectedSubstrateId, sequenceSteps, setSequenceSteps, lockedWells, setLockedWells, virtualGridParams, setVirtualGridParams, customSubstrateParams, nextStep, prevStep, simState, setSimState, goToStep, simReExecuteRef, simSpeedRef } = useWizard();
   const substrate = SUBSTRATE_TYPES[selectedSubstrateId];
   const [selectedWells, setSelectedWells] = useState(new Set());
   const [volume, setVolume] = useState('10');
   const [randomPercent, setRandomPercent] = useState(50);
   const [panelHeight, setPanelHeight] = useState(null);
+  const [simCompleted, setSimCompleted] = useState(false);
   const svgRef = useRef(null);
   const wellMeta = useRef({});
   const fileRef = useRef(null);
@@ -482,11 +466,138 @@ const StepSequence = () => {
     e.target.value = null;
   };
 
+  
+  const handleCancelSimulation = () => {
+    setSimCompleted(false);
+    setSimState(prev => ({
+      ...prev,
+      active: false,
+      currentWell: null,
+      depositedWells: new Set(),
+      cancelled: true,
+    }));
+  };
+
+  const handleReExecuteSimulation = () => {
+    setSimCompleted(false);
+    if (simReExecuteRef.current) {
+      simReExecuteRef.current();
+    }
+  };
+
   const totalDeposits = sequenceSteps.reduce((a, s) => a + s.wells.size, 0);
   const availableWells = Object.keys(wellMeta.current).length - lockedWells.size;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+      {/* Simulation control bar */}
+      {simState.active && simState.currentWell && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '0.75rem 1rem',
+            backgroundColor: 'rgba(37,99,235,0.1)',
+            border: '1px solid rgba(37,99,235,0.3)',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+            >
+              <Droplets size={18} color="var(--accent-primary)" />
+            </motion.div>
+            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+              Paso {simState.currentWell.stepIndex + 1} - 
+              Depositando: <strong>{simState.currentWell.wellId}</strong>
+            </span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              ({simState.currentWell.depositIndex + 1}/{simState.currentWell.totalDeposits})
+            </span>
+          </div>
+
+          <div style={{
+            flex: 1,
+            height: '6px',
+            backgroundColor: '#e2e8f0',
+            borderRadius: '3px',
+            overflow: 'hidden',
+            minWidth: '100px',
+          }}>
+            <div
+              style={{
+                height: '100%',
+                width: ((simState.currentWell.depositIndex + 1) / simState.currentWell.totalDeposits) * 100 + '%',
+                backgroundColor: 'var(--accent-primary)',
+                borderRadius: '3px',
+                transition: 'width 0.1s ease',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.25rem' }}>
+            {[0.1, 0.25, 0.5, 1, 2, 4].map(speed => (
+              <button
+                key={speed}
+                className={simState.speed === speed ? 'btn-primary' : 'btn-secondary'}
+                onClick={() => setSimState(prev => ({ ...prev, speed }))}
+                style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', minWidth: '40px' }}
+              >
+                {speed}x
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="btn-danger"
+            onClick={handleCancelSimulation}
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+          >
+            <Square size={14} /> Cancelar
+          </button>
+        </motion.div>
+      )}
+
+      {/* Simulation completed banner */}
+      {simCompleted && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '0.75rem 1rem',
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            border: '1px solid rgba(16,185,129,0.3)',
+            flexWrap: 'wrap',
+          }}
+        >
+          <CheckCircle size={20} color="var(--accent-success)" />
+          <span style={{ fontWeight: 600 }}>Simulacion completada</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {simState.depositedWells.size} depositos realizados
+          </span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+            <button className="btn-secondary" onClick={handleReExecuteSimulation}>
+              Re-ejecutar simulacion
+            </button>
+            <button className="btn-primary" onClick={() => goToStep(5)}>
+              Volver a Ejecucion
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+
 
       {/* Virtual grid controls for non-multiwell */}
       {substrate.isVirtualGrid && (() => {
@@ -544,7 +655,9 @@ const StepSequence = () => {
               <PlateRenderer substrate={substrate} selectedWells={selectedWells}
                 stepWells={stepWells} stepVolumes={sequenceSteps.map(s => s.volume)}
                 onWellClick={handleWellClick}
-                wellMeta={wellMeta} virtualParams={virtualGridParams} />
+                wellMeta={wellMeta} virtualParams={virtualGridParams}
+                customSubstrateParams={customSubstrateParams}
+                simState={simState} />
               {rect && rect.w > 1 && (
                 <rect x={rect.x} y={rect.y} width={rect.w} height={rect.h}
                   fill="rgba(37,99,235,0.08)" stroke="#2563eb" strokeWidth={0.4} strokeDasharray="2 1" />

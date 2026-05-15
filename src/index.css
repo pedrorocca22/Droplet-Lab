@@ -174,3 +174,87 @@ input:focus, textarea:focus, select:focus {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.25rem; }
+
+
+/* Simulation Modal Styles */
+.sim-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.sim-modal {
+  background: var(--glass-bg, #1e293b);
+  border: 1px solid var(--glass-border, rgba(148, 163, 184, 0.2));
+  border-radius: var(--radius-lg, 16px);
+  padding: 2rem;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.speed-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.speed-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 0.5rem;
+  border: 2px solid var(--glass-border, rgba(148, 163, 184, 0.2));
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.speed-option-btn.active {
+  border-color: var(--accent-primary, #2563eb);
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.speed-option-btn:hover {
+  border-color: var(--accent-primary, #2563eb);
+}
+
+.speed-option-btn strong {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.speed-option-btn span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.speed-option-btn .delay {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.time-estimate {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(37, 99, 235, 0.05);
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
