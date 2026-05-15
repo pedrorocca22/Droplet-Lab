@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useWizard } from '../context/WizardContext';
 import { connectSerial, disconnectSerial, sendLineAndWaitForOk } from '../utils/serialCommunication';
-import { ArrowLeft, ArrowRight, Zap, Beaker } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Zap, Beaker, Route } from 'lucide-react';
 
 const InputGroup = ({ label, value, onChange, type = "number", step = "1", suffix }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -126,6 +126,47 @@ const StepConfig = () => {
         </div>
 
       </div>
+
+        {/* Estrategia de Ruta */}
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 500, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Route size={18} /> Estrategia de Ruta</h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Define el orden en que se visitan los pocillos durante la deposicion</p>
+          
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              onClick={() => handleConfigChange('routeStrategy', 'nearest')}
+              style={{
+                flex: 1, padding: '1rem', borderRadius: '8px', cursor: 'pointer',
+                border: config.routeStrategy === 'nearest' ? '2px solid var(--accent-primary)' : '2px solid var(--glass-border, rgba(148,163,184,0.2))',
+                background: config.routeStrategy === 'nearest' ? 'rgba(37,99,235,0.1)' : 'transparent',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                transition: 'all 0.2s',
+              }}
+            >
+              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>Vecino mas cercano</strong>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                Optimiza la ruta visitando pocillos adyacentes primero. Minimiza distancia total de recorrido.
+              </span>
+            </button>
+            
+            <button
+              onClick={() => handleConfigChange('routeStrategy', 'manual')}
+              style={{
+                flex: 1, padding: '1rem', borderRadius: '8px', cursor: 'pointer',
+                border: config.routeStrategy === 'manual' ? '2px solid var(--accent-primary)' : '2px solid var(--glass-border, rgba(148,163,184,0.2))',
+                background: config.routeStrategy === 'manual' ? 'rgba(37,99,235,0.1)' : 'transparent',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                transition: 'all 0.2s',
+              }}
+            >
+              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>Orden manual</strong>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                Respeta exactamente el orden en que seleccionaste los pocillos en la secuencia.
+              </span>
+            </button>
+          </div>
+        </div>
+
 
       <div className="glass-panel" style={{ background: 'rgba(139, 92, 246, 0.05)', borderColor: 'var(--accent-purple)', marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.125rem', fontWeight: 500, color: 'var(--accent-purple)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
