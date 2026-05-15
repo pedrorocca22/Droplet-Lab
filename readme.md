@@ -44,7 +44,8 @@ Droplet Lab is a professional web application designed to orchestrate the deposi
 | **Custom Platforms** | Rect / Circle | Fully configurable dimensions and safe zones |
 | **Slides** | 75x25mm | Virtual grid, cover slip area indication |
 
-https://github.com/user-attachments/assets/4317fed2-0f8a-4033-9161-ba7a7c95734b
+
+https://github.com/user-attachments/assets/2055fae3-f98e-49e9-a95d-7224c9ab996e
 
 ---
 
